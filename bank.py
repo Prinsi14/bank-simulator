@@ -1,4 +1,4 @@
-# Our accounts storage - starts empty
+from datetime import datetime
 accounts = {
     "test_user":{
         "name": "Test User",
@@ -40,11 +40,19 @@ def  deposit():
     account_id = input("enter your account ID: ")
     if account_id not in accounts:
         print("Account Not Found")
+        
+        
         return
     amount =float(input("Enter The Amount :"))
     accounts[account_id]["balance"]+= amount
     print("Deposit Succesfully")
     print("New Balance is :",accounts[account_id]["balance"])
+    accounts[account_id]["transactions"].append({
+            "type" : "deposit",
+            "amount": amount,
+            "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        })
+ 
 
 def withdraw():
     print("----Withdraw----")
@@ -59,6 +67,11 @@ def withdraw():
     accounts[account_id]["balance"]-= amount
     print("Withdraw Succesfully")
     print("New Balance is:",accounts[account_id]["balance"])
+    accounts[account_id]["transactions"].append({
+        "type" : "withdraw",
+        "amount": amount,
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
 
 def transfer():
     print("----Transfer----")
@@ -82,11 +95,36 @@ def transfer():
     accounts[to_id]["balance"]+= amount
     print("transfer succesfully!")
     print("your new balance is:",accounts[from_id]["balance"])
+    accounts[from_id]["transactions"].append({
+        "type" : "transfer",
+        "amount": amount,
+        "to": to_id,
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
+    accounts[to_id]["transactions"].append({
+        "type"  : "transfer in",
+        "amount": amount,
+        "from"  : from_id,
+        "time"  : datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    })
+def transaction_history():
+    print("----Transaction History----")
+    account_id = input("Enter your account ID: ")
+    if account_id not in accounts:
+        print("Account not found!")
+        return
+    transactions = accounts[account_id]["transactions"]
+    if not transactions:
+        print("No transactions found.")
+        return
+    for transaction in transactions:
+        print(f"{transaction['time']} - {transaction['type'].capitalize()} of amount {transaction['amount']}")
 
 create_account()
 deposit()
 withdraw()
 transfer()
+transaction_history()
 
 
 
